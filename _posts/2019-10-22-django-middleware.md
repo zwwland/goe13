@@ -1,0 +1,49 @@
+[TOC]
+
+### 中间件是什么？
+ 本质上是一些类。在经过view之前一系列执行的方法。
+ 
+### 中间件：
+* process_request
+* process_view
+* process_template
+* process_exception
+* process_response
+ 
+ 
+### 中间件由上而下依次执行：   
+* 先依次执行每个中间件的process_request-> 
+* 如果有错误，依次执行process_exception->
+* 依次返回执行process_response(由下而上)-> 
+* 如果没有错误，依次执行process_view->
+* 如果有错误，依次执行process_exception->
+* 依次返回执行process_response(由下而上)->
+* 执行到view方法，如果有render->
+* 依次执行process_template->
+* 如果有错误，依次执行process_exception->
+* 依次返回执行process_response(由下而上)->
+* 没有错误执行process_response(由上而下)
+ 
+current_option.py:
+
+```python 
+from django.utils.deprecation import MiddlewareMixin
+class TestMiddleware(MiddlewareMixin):
+　　def process_request(self, request):
+　　　　print(request.META.get('REMOTE_ADDR'))
+　　def process_view(self, request, callback, callback_args, callback_kwargs):
+　　　　pass
+　　def process_template_response(self,request,response):
+　　　　pass
+　　def process_exception(self, request, exception):
+　　　　pass
+　　def process_response(self, request, response):
+　　　　return response
+```
+```python
+settings.py:
+     MIDDLEWARE = [
+    'app01.comments.current_option.TestMiddleware',
+          ...
+         ]
+```
