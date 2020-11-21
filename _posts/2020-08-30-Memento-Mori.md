@@ -106,6 +106,14 @@ docker logs -f myjenkins
 docker inspect 4**********d
 
 ```
+
+### ubuntu 安装nodejs
+```bash
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+
 ### rails
 ```bash
 ruby 安装
@@ -240,4 +248,9 @@ then
  proc_id           # 获取新进程号
  echo ${pid}, `date` >> $file_name  # 将新进程号和重启时间记录
 fi
+```
+### linux command
+1. download redirect
+```sh
+curl -fsSL https://xxx.xxx.xxx/xxx.sh | sh
 ```
