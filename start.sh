@@ -1,1 +1,1 @@
-nohup jekyll s > jekyll.out 2>&1 & 
+nohup jekyll s --trace> jekyll.out 2>&1 & 
