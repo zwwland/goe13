@@ -7,6 +7,7 @@ class NW2
   attr_reader :s, :lts, :lseq1, :lseq2
 
   def initialize(seq1, seq2)
+
     @seq1 = seq1
     @seq2 = seq2
     @gap = '-'
@@ -72,19 +73,18 @@ class NW2
     seq1 = '-' + @seq1
     seq2 = '-' + @seq2
 
-
     (0...(seq1.length)).each do |yy|
       (0...(seq2.length)).each do |xx|
 
         if yy == 0 && xx == 0
           @matrix_score[yy][xx] = 0
-          @matrix_trace[yy][xx] = '-'
+          @matrix_trace[yy][xx] = '↖'
         elsif yy == 0
           @matrix_score[yy][xx] = xx * -1
-          @matrix_trace[yy][xx] = '-'
+          @matrix_trace[yy][xx] = '←'
         elsif xx == 0
           @matrix_score[yy][xx] = yy * -1
-          @matrix_trace[yy][xx] = '-'
+          @matrix_trace[yy][xx] = '↑'
         else
           score = @matrix_score[yy - 1][xx - 1] + compare(seq1[yy], seq2[xx])
           trace = '↖'
@@ -119,15 +119,15 @@ class NW2
     while y > 0 || x > 0
       if @matrix_trace[y][x] == '↖'
         trace << [y, x]
+        @lts += seq1[y]
         @lseq1 += seq1[y]
         @lseq2 += seq2[x]
-        @lts += seq1[y]
         y -= 1
         x -= 1
       elsif @matrix_trace[y][x] == '↑'
         trace << [y, x]
-        @lseq1 += @s
         @lts += seq1[y]
+        @lseq1 += @s
         y -= 1
       elsif @matrix_trace[y][x] == '←'
         trace << [y, x]
@@ -140,9 +140,9 @@ class NW2
     @lseq1.reverse!
     @lseq2.reverse!
 
-    puts @lts
-    puts @lseq1
-    puts @lseq2
+    # puts @lts
+    # puts @lseq1
+    # puts @lseq2
 
     trace.reverse
   end
