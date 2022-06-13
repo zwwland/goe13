@@ -5,7 +5,7 @@
 require 'json'
 
 class NW2
-  attr_accessor :seq1, :seq2, :gap
+  attr_accessor :seq1, :seq2, :gap, :data
   attr_reader :s, :lts, :lseq1, :lseq2, :matrix_trace
 
   def initialize(seq1, seq2, gap = 1)
@@ -27,7 +27,13 @@ class NW2
       'lseq2' => '',
       'trace' => []
     }
-    get_trace d
+    seq1 = "-#{@seq1}"
+    seq2 = "-#{@seq2}"
+    y = seq1.length - 1
+    x = seq2.length - 1
+    @data << d
+    get_trace y, x, seq1, seq2, d
+    @data.each { |a| a.each_value(&:reverse!) }
   end
 
   def print_matrix
@@ -92,8 +98,8 @@ class NW2
           @matrix_trace[yy][xx] << '←'
         else
           c_score = @matrix_score[yy - 1][xx - 1] + compare(seq1[yy], seq2[xx])
-          l_score = @matrix_score[yy][xx - 1] - @gap
-          t_score = @matrix_score[yy - 1][xx] - @gap
+          l_score = @matrix_score[yy][xx - 1] - @gap + 1
+          t_score = @matrix_score[yy - 1][xx] - @gap + 1
           score = [c_score, l_score, t_score].max
           @matrix_score[yy][xx] = score
           @matrix_trace[yy][xx] << '←' if l_score == score
@@ -130,25 +136,16 @@ class NW2
   end
 end
 
-def get_trace(data)
-  @data << data
-  seq1 = "-#{@seq1}"
-  seq2 = "-#{@seq2}"
-  y = seq1.length - 1
-  x = seq2.length - 1
+def get_trace(y, x, seq1, seq2, data)
   while y.positive? || x.positive?
     mt = @matrix_trace[y][x]
-    if mt.length.positive?
-      mt.each do |_m|
-        d = JSON.parse(JSON.dump(data))
-        get_trace_branch(y, x, d, seq1, seq2, _m)
-        get_trace(data)
-      end
-    else
-      y, x = get_trace_branch(y, x, data, seq1, seq2, mt[0])
+    mt.each_index do |ei|
+      d = ei.positive? ? JSON.parse(JSON.dump(data)) : data
+      @data << d if ei.positive?
+      yy, xx = get_trace_branch(y, x, d, seq1, seq2, mt[ei])
+      get_trace(yy, xx, seq1, seq2, d)
     end
   end
-  @data
 end
 
 n = NW2.new('B', 'ATGDF')
