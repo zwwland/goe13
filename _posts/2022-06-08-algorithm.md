@@ -2,7 +2,6 @@
 
 ```ruby
 
-require 'json'
 
 class NW2
   attr_accessor :seq1, :seq2, :gap, :data
@@ -137,14 +136,18 @@ class NW2
 end
 
 def get_trace(y, x, seq1, seq2, data)
-  while y.positive? || x.positive?
-    mt = @matrix_trace[y][x]
-    mt.each_index do |ei|
-      d = ei.positive? ? JSON.parse(JSON.dump(data)) : data
-      @data << d if ei.positive?
-      yy, xx = get_trace_branch(y, x, d, seq1, seq2, mt[ei])
-      get_trace(yy, xx, seq1, seq2, d)
+  return unless y.positive? || x.positive?
+
+  mt = @matrix_trace[y][x]
+  mt.each_index do |ei|
+    if ei.zero?
+      d = data
+    else
+      d = data.copy
+      @data << d
     end
+    yy, xx = get_trace_branch(y, x, d, seq1, seq2, mt[ei])
+    get_trace(yy, xx, seq1, seq2, d)
   end
 end
 
